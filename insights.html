@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SNHU Dashboard – Insights</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    /* Container */
+    .content { padding: 2rem; max-width: 900px; margin: auto; font-family: 'Segoe UI', sans-serif; }
+    h1 { font-size: 2rem; margin-bottom: 1rem; }
+
+    /* AI Highlights Panel */
+    .ai-panel { background: #fefefe; border-radius: 8px; padding: 1.5rem; box-shadow: 0 2px 6px rgba(0,0,0,0.1); margin-bottom: 2rem; }
+    .ai-panel h2 { font-size: 1.5rem; margin-bottom: 1rem; color: #1e3a8a; }
+    .ai-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; }
+    .ai-stat { background: #f0f2f5; border-radius: 6px; padding: 1rem; text-align: center; }
+    .ai-stat h3 { margin: 0; font-size: 1rem; color: #374151; }
+    .ai-stat p { margin: 0.5rem 0 0; font-size: 1.25rem; font-weight: bold; color: #00457c; }
+
+    /* Search Input */
+    .dropdown { margin-bottom: 1rem; text-align: right; }
+    #search-input { padding: 0.5rem 1rem; width: 250px; border: 1px solid #ccc; border-radius: 20px; outline: none; transition: border-color 0.2s; }
+    #search-input:focus { border-color: #1e3a8a; }
+
+    /* Table Styling */
+    table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    thead { background: #1e3a8a; color: #fff; }
+    th, td { padding: 0.75rem 1rem; }
+    th { text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.03em; }
+    tbody tr { background: #fff; transition: background 0.2s; }
+    tbody tr:nth-child(even) { background: #f9fafb; }
+    tbody tr:hover { background: #e5e5e5; }
+    td { cursor: pointer; }
+
+    /* Details Panel */
+    .details-panel { display: none; margin-top: 2rem; background: #fff; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .details-header { font-size: 1.4rem; margin-bottom: 1rem; color: #1e3a8a; }
+    .chart-row { display: flex; gap: 2rem; flex-wrap: wrap; }
+    .gauge-container, .trend-container { background: #f9fafb; border-radius: 6px; padding: 1rem; flex: 1; min-width: 250px; }
+    .gauge-container { display: flex; align-items: center; justify-content: center; height: 150px; }
+    .trend-container { height: 250px; }
+    .improve-msg { margin-top: 1rem; font-size: 1rem; color: #374151; }
+  </style>
+</head>
+<body>
+  <aside>
+    <nav>
+      <a href="index.html">Overview</a>
+      <a href="categories.html">Trends</a>
+      <a href="insights.html" class="active">Insights</a>
+      <a href="recommendations.html">Recommendations</a>
+      <a href="chat.html">AI Chat</a>
+    </nav>
+  </aside>
+
+  <div class="content">
+    <h1>Insights</h1>
+
+    <section id="ai-insights" class="ai-panel">
+      <h2>🔍 AI‑Generated Highlights</h2>
+      <div class="ai-stats">
+        <div class="ai-stat"><h3>Total Categories</h3><p id="stat-count">–</p></div>
+        <div class="ai-stat"><h3>Average 2022 Score</h3><p id="stat-avg">–</p></div>
+        <div class="ai-stat"><h3>Highest Category</h3><p id="stat-highest">–</p></div>
+        <div class="ai-stat"><h3>Lowest Category</h3><p id="stat-lowest">–</p></div>
+      </div>
+    </section>
+
+    <div class="dropdown">
+      <input type="text" id="search-input" placeholder="Filter by category…" />
+    </div>
+
+    <table>
+      <thead>
+        <tr><th>Category</th><th>2022</th><th>2023 (Predicted)</th></tr>
+      </thead>
+      <tbody id="insights-body"></tbody>
+    </table>
+
+    <div id="details" class="details-panel">
+      <div class="details-header" id="details-title"></div>
+      <div class="chart-row">
+        <div class="gauge-container">
+          <canvas id="gaugeChart"></canvas>
+        </div>
+        <div class="trend-container">
+          <canvas id="trendChart"></canvas>
+        </div>
+      </div>
+      <p id="improvement-msg" class="improve-msg"></p>
+    </div>
+  </div>
+
+  <script type="module">
+    import data from './data.js';
+
+    // AI Highlights
+    function renderAIInsights(arr) {
+      const scores = arr.map(d => d.points2022);
+      document.getElementById('stat-count').textContent = arr.length;
+      document.getElementById('stat-avg').textContent = (scores.reduce((a,b)=>a+b,0)/scores.length).toFixed(2);
+      const max = Math.max(...scores);
+      const min = Math.min(...scores);
+      document.getElementById('stat-highest').textContent = `${arr.find(d=>d.points2022===max).category} (${max.toFixed(2)})`;
+      document.getElementById('stat-lowest').textContent = `${arr.find(d=>d.points2022===min).category} (${min.toFixed(2)})`;
+    }
+
+    // Table rendering
+    function renderTable(filter='') {
+      const tbody = document.getElementById('insights-body'); tbody.innerHTML = '';
+      data.categories.filter(d=>d.category.toLowerCase().includes(filter)).forEach(d=>{
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${d.category}</td><td>${d.points2022.toFixed(2)}</td><td>${d.predicted2023.toFixed(2)}</td>`;
+        tr.onclick = () => showDetails(d);
+        tbody.appendChild(tr);
+      });
+    }
+
+    let gaugeChart, trendChart;
+    function showDetails(entry) {
+      document.getElementById('details').style.display = 'block';
+      document.getElementById('details-title').textContent = entry.category;
+
+      const diff = entry.predicted2023 - entry.points2022;
+      const pct = (diff/entry.points2022)*100;
+      const color = diff>=0 ? '#10b981' : '#ef4444';
+
+      // Render gauge
+      const ctxG = document.getElementById('gaugeChart').getContext('2d');
+      if (gaugeChart) gaugeChart.destroy();
+      gaugeChart = new Chart(ctxG, {
+        type: 'doughnut',
+        data: { labels: ['Change','Remaining'], datasets: [{ data: [Math.min(Math.abs(pct),100), 100-Math.min(Math.abs(pct),100)], backgroundColor: [color,'#e5e7eb'], borderWidth: 0 }] },
+        options: { rotation: -Math.PI, circumference: Math.PI, cutout: '75%', plugins: { legend:{display:false}, tooltip:{enabled:false} } }
+      });
+
+      // Render trend
+      const ctxT = document.getElementById('trendChart').getContext('2d');
+      if (trendChart) trendChart.destroy();
+      trendChart = new Chart(ctxT, {
+        type: 'bar',
+        data: { labels:['2022','2023'], datasets:[{ label:'Points', data:[entry.points2022, entry.predicted2023], backgroundColor:['#1e3a8a','#f59e0b'] }] },
+        options: { scales:{ y:{ beginAtZero:true } }, plugins:{ legend:{display:false} } }
+      });
+
+      // Improvement message
+      const msg = diff>=0 ? `Increase of ${diff.toFixed(2)} points (+${pct.toFixed(1)}%). Great!` : `Decrease of ${(-diff).toFixed(2)} points (${pct.toFixed(1)}%). Consider action.`;
+      document.getElementById('improvement-msg').textContent = msg;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderAIInsights(data.categories);
+      renderTable();
+      document.getElementById('search-input').addEventListener('input', e => renderTable(e.target.value.toLowerCase()));
+    });
+  </script>
+</body>
+</html>

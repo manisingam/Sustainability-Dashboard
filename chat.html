@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>SNHU Sustainability AI Chat</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg: #f0f2f5;
+      --card: #fff;
+      --text: #333;
+      --accent: #1e3a8a;
+      --accent-light: #f59e0b;
+    }
+    body {
+      margin: 0;
+      display: flex;
+      font-family: Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    aside {
+      width: 200px;
+      background: var(--accent);
+      color: #fff;
+      height: 100vh;
+      position: fixed;
+    }
+    nav {
+      display: flex;
+      flex-direction: column;
+      padding: 1rem;
+    }
+    nav a {
+      color: #cfd8dc;
+      text-decoration: none;
+      margin: .5rem 0;
+      padding: .5rem;
+      border-radius: 4px;
+      transition: background .3s, transform .2s;
+    }
+    nav a:hover { background: #00457c; transform: translateX(4px); }
+    nav a.active { background: #005a9e; color: #fff; }
+    .content {
+      margin-left: 200px;
+      padding: 1rem;
+      width: calc(100% - 200px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .chat-app {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      max-width: 400px;
+      height: 60vh;
+      background: var(--card);
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      overflow: hidden;
+    }
+    .chat-header {
+      background: linear-gradient(90deg, var(--accent), var(--accent-light));
+      color: #fff;
+      text-align: center;
+      padding: 1rem;
+      font-size: 1.25rem;
+      font-weight: bold;
+    }
+    .chat-messages {
+      flex: 1;
+      padding: 1rem;
+      background: var(--bg);
+      overflow-y: auto;
+      scroll-behavior: smooth;
+    }
+    .message {
+      display: flex;
+      margin-bottom: .75rem;
+      opacity: 0;
+      animation: fadeIn .3s forwards;
+    }
+    .message.user { justify-content: flex-end; }
+    .message.ai  { justify-content: flex-start; }
+    .avatar {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: bold;
+      margin: 0 .5rem;
+      flex-shrink: 0;
+    }
+    .message.ai .avatar {
+      background: var(--accent); color: #fff;
+      content: '🛡';
+    }
+    .bubble {
+      max-width: 70%;
+      padding: .75rem 1rem;
+      border-radius: 12px;
+      position: relative;
+      background: #e5e5e5;
+      color: var(--text);
+      word-wrap: break-word;
+    }
+    .message.user .bubble {
+      background: var(--accent);
+      color: #fff;
+    }
+    .timestamp {
+      position: absolute;
+      bottom: -1.2rem;
+      right: .5rem;
+      font-size: .7rem;
+      color: #666;
+    }
+    .message.ai.loading .bubble::after {
+      content: '';
+      position: absolute; right: .75rem; top: 50%;
+      transform: translateY(-50%);
+      width: 16px; height: 16px;
+      border: 2px solid var(--accent); border-top-color: transparent;
+      border-radius: 50%; animation: spin .8s linear infinite;
+    }
+    .suggestions {
+      display: flex;
+      gap: .5rem;
+      flex-wrap: wrap;
+      padding: 0 .75rem .75rem;
+    }
+    .chip {
+      background: #fff;
+      border: 1px solid var(--accent);
+      border-radius: 16px;
+      padding: .4rem .8rem;
+      font-size: .85rem;
+      cursor: pointer;
+      transition: background .2s, color .2s;
+    }
+    .chip:hover {
+      background: var(--accent);
+      color: #fff;
+    }
+    .chat-input {
+      display: flex;
+      padding: .75rem;
+      background: var(--card);
+      border-top: 1px solid #ddd;
+    }
+    .chat-input input {
+      flex: 1;
+      padding: .5rem 1rem;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 20px;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .chat-input input:focus { border-color: var(--accent); }
+    .chat-input button {
+      margin-left: .5rem;
+      background: var(--accent);
+      border: none;
+      border-radius: 50%;
+      width: 40px; height: 40px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: #fff; font-size: 1.2rem;
+     
+    }
+    .chat-input button:hover { background: var(--accent-light); }
+    @keyframes fadeIn { to { opacity: 1; } }
+    @keyframes spin { to { transform: translateY(-50%) rotate(360deg); } }
+    .chart-container {
+      position: relative;
+      width: 100%; height: 300px;
+      margin-top: .75rem;
+      background: var(--card);
+      border-radius: 12px;
+      padding: .5rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .chart-canvas { width: 100% !important; height: 100% !important; }
+  </style>
+</head>
+<body>
+  <aside>
+    <nav>
+      <a href="index.html">Overview</a>
+      <a href="categories.html">Trends</a>
+      <a href="insights.html">Insights</a>
+      <a href="recommendations.html">Recommendations</a>
+      <a href="chat.html" class="active">AI Chat</a>
+    </nav>
+  </aside>
+  <div class="content">
+    <div class="chat-app">
+      <div class="chat-header">SNHU Sustainability Chat</div>
+      <div class="chat-messages" id="chat-window"></div>
+      <div class="suggestions" id="suggestions">
+        <div class="chip">Show chart</div>
+        <div class="chip">Emissions data</div>
+        <div class="chip">Forecast 2024</div>
+      </div>
+      <div class="chat-input">
+        <input id="chat-input" type="text" placeholder="Ask me anything..." autocomplete="off" />
+        <button id="send-btn">➤</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const chatWindow = document.getElementById('chat-window');
+    const input      = document.getElementById('chat-input');
+    const sendBtn    = document.getElementById('send-btn');
+    const suggestions = document.getElementById('suggestions');
+
+    function formatTime() {
+      const d = new Date();
+      return d.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+    }
+
+    function appendMessage(text, role) {
+      removeLoading();
+      const msg = document.createElement('div');
+      msg.className = 'message ' + role + (role==='ai' ? '' : '');
+      const avatar = document.createElement('div');
+      avatar.className = 'avatar';
+      avatar.textContent = role==='user' ? 'U' : '🛡';
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+      bubble.textContent = text;
+      const stamp = document.createElement('span');
+      stamp.className = 'timestamp';
+      stamp.textContent = formatTime();
+      bubble.appendChild(stamp);
+
+      if (role==='user') msg.append(bubble, avatar);
+      else msg.append(avatar, bubble);
+
+      chatWindow.appendChild(msg);
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+      return bubble;
+    }
+
+    function removeLoading() {
+      const loading = document.querySelector('.message.ai.loading');
+      if (loading) loading.remove();
+    }
+
+    suggestions.addEventListener('click', e => {
+      if (!e.target.classList.contains('chip')) return;
+      input.value = e.target.textContent;
+      sendMessage();
+    });
+
+    async function renderChart() {
+      const res = await fetch('2025_Submission_Excel_Cleaned.json');
+      const data = await res.json();
+      const catMap = {};
+      data.forEach(e => {
+        const cat = e.Category, val = e['Points Attainable'];
+        if (cat && cat!=='N/A' && typeof val==='number') {
+          catMap[cat] = (catMap[cat]||0) + val;
+        }
+      });
+      const labels = Object.keys(catMap), values = Object.values(catMap);
+      const container = document.createElement('div');
+      container.className = 'chart-container';
+      const canvas = document.createElement('canvas');
+      canvas.className = 'chart-canvas';
+      container.appendChild(canvas);
+      chatWindow.appendChild(container);
+
+      new Chart(canvas.getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            data: values,
+            backgroundColor: 'rgba(30,58,138,0.7)',
+            borderColor: '#1e3a8a',
+            borderWidth: 2,
+            borderRadius: 4,
+            barPercentage: 0.6
+          }]
+        },
+        options: {
+          responsive:true,
+          maintainAspectRatio:false,
+          scales:{
+            x:{ grid:{display:false}, ticks:{maxRotation:60,minRotation:60}},
+            y:{ beginAtZero:true, grid:{color:'#eee'}}
+          },
+          plugins:{
+            legend:{display:false},
+            tooltip:{ backgroundColor:'rgba(30,58,138,0.8)', titleColor:'#fff', bodyColor:'#fff' }
+          }
+        }
+      });
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+    async function sendMessage() {
+      const text = input.value.trim();
+      if (!text) return;
+      appendMessage(text,'user');
+      input.value = '';
+      const loadingMsg = appendMessage('','ai');
+      loadingMsg.parentNode.classList.add('loading');
+
+      if (text.toLowerCase().includes('chart')) {
+        removeLoading();
+        await renderChart();
+        return;
+      }
+      try {
+        const res = await fetch('http://localhost:8000/api/chat', {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ message: text })
+        });
+        const { reply } = await res.json();
+        appendMessage(reply,'ai');
+      } catch {
+        appendMessage('😞 Something went wrong.','ai');
+      }
+    }
+
+    sendBtn.addEventListener('click', sendMessage);
+    input.addEventListener('keypress', e => { if (e.key==='Enter') sendMessage(); });
+  </script>
+</body>
+</html>

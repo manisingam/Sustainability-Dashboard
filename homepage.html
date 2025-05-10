@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SNHU Sustainability AI Dashboard – Home</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <aside>
+    <nav>
+      <a href="homepage.html" class="active">Home</a>
+      <a href="index.html">Overview</a>
+      <a href="categories.html">Trends</a>
+      <a href="insights.html">Insights</a>
+      <a href="recommendations.html">Recommendations</a>
+      <a href="chat.html">AI Chat</a>
+    </nav>
+  </aside>
+
+  <main class="home-content">
+    <!-- Hero -->
+    <header class="hero">
+      <h1>SNHU Sustainability AI Dashboard</h1>
+      <p class="lead">Leverage AI to visualize, forecast, and optimize SNHU’s sustainability performance.</p>
+      <a href="index.html" class="btn btn-primary">Explore Dashboard</a>
+    </header>
+
+    <!-- Quick Metrics -->
+    <section class="quick-metrics">
+      <div class="metric-card fade-in">
+        <h3>Total 2022 Points</h3>
+        <p class="metric-value">23.49</p>
+      </div>
+      <div class="metric-card fade-in" style="animation-delay: 0.2s">
+        <h3>Predicted 2023</h3>
+        <p class="metric-value">25.84</p>
+      </div>
+      <div class="metric-card fade-in" style="animation-delay: 0.4s">
+        <h3>Categories</h3>
+        <p class="metric-value">7</p>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section class="features">
+      <h2 class="section-title">Key Features</h2>
+      <div class="feature-grid">
+        <div class="feature-card slide-up">
+          <div class="icon">🔍</div>
+          <h3>Data Integration</h3>
+          <p>Auto‑ingest & normalize STARS data from multiple years.</p>
+        </div>
+        <div class="feature-card slide-up" style="animation-delay:0.1s">
+          <div class="icon">📊</div>
+          <h3>Interactive Charts</h3>
+          <p>Drill‑down into trends with dynamic bar, line, and radar charts.</p>
+        </div>
+        <div class="feature-card slide-up" style="animation-delay:0.2s">
+          <div class="icon">🤖</div>
+          <h3>AI Predictions</h3>
+          <p>Machine‑learning forecasts for your next year’s sustainability scores.</p>
+        </div>
+        <div class="feature-card slide-up" style="animation-delay:0.3s">
+          <div class="icon">💡</div>
+          <h3>Actionable Insights</h3>
+          <p>AI‑driven recommendations tailored for SNHU’s campus.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="how-it-works fade-in">
+      <h2 class="section-title">How It Works</h2>
+      <ol class="steps">
+        <li><strong>Upload & Clean:</strong> Prepare your JSON/STARS dataset.</li>
+        <li><strong>Analyze & Forecast:</strong> AI uncovers patterns and predicts.</li>
+        <li><strong>Visualize & Optimize:</strong> Interactive dashboard + recommendations.</li>
+      </ol>
+    </section>
+
+    <!-- AI Chat Teaser -->
+    <section class="chat-teaser slide-up">
+      <h2>Need Quick Answers?</h2>
+      <p>Ask our AI agent anything about SNHU sustainability metrics right here.</p>
+      <a href="chat.html" class="btn btn-secondary">Try AI Chat</a>
+    </section>
+
+    <!-- Footer -->
+    <footer class="site-footer fade-in">
+      <p>© 2025 SNHU Sustainability Team • Built with ❤️ and AI</p>
+    </footer>
+  </main>
+
+  <style>
+    /* Layout */
+    /* === LAYOUT FIX: Grid with fixed sidebar === */
+body {
+  margin: 0;
+  display: grid;
+  grid-template-columns: 220px 1fr;    /* sidebar is 220px wide */
+  min-height: 100vh;
+  font-family: 'Segoe UI', sans-serif;
+  background: #f7f9fc;
+}
+
+/* Sidebar */
+aside {
+  grid-column: 1;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  width: 220px;
+  background: #00457c;
+  overflow-y: auto;
+}
+aside nav a {
+  display: block;
+  padding: 15px;
+  color: #fff;
+  text-decoration: none;
+  transition: background-color 0.3s;
+}
+aside nav a:hover,
+aside nav a.active {
+  background: #022a4f;
+}
+
+/* Main content */
+main.home-content {
+  grid-column: 2;                 /* start in the second column */
+  margin-left: 0;                 /* no extra margin needed, grid handles it */
+  padding: 2rem;
+}
+
+/* Utility: ensure cards & sections don’t bleed under the nav */
+.home-content > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Example tweak: make sure your hero, cards, etc. still animate */
+@keyframes fadeInUp { to { opacity: 1; transform: translateY(0);} }
+@keyframes slideUp  { to { opacity: 1; transform: translateY(0);} }
+@keyframes fadeIn   { to { opacity: 1;} }
+
+/* (Keep the rest of your component styles as before…) */
+
+    /* Hero */
+    .hero {
+      background: #e1f0ff;
+      text-align: center;
+      padding: 4rem 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 3rem;
+    }
+    .hero h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .hero .lead {
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+      color: #333;
+    }
+    .btn {
+      display: inline-block;
+      padding: 0.75rem 1.5rem;
+      border-radius: 4px;
+      text-decoration: none;
+      transition: background-color 0.3s, transform 0.2s;
+    }
+    .btn-primary {
+      background: #007bff; color: #fff;
+    }
+    .btn-primary:hover {
+      background: #0056b3;
+      transform: translateY(-2px);
+    }
+    .btn-secondary {
+      background: #fff; color: #007bff; border: 2px solid #007bff;
+    }
+    .btn-secondary:hover {
+      background: #007bff; color: #fff;
+      transform: translateY(-2px);
+    }
+
+    /* Quick Metrics */
+    .quick-metrics {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 3rem;
+    }
+    .metric-card {
+      flex: 1;
+      background: #fff;
+      padding: 1.5rem;
+      border-radius: 8px;
+      text-align: center;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+      opacity: 0; animation: fadeInUp 0.6s forwards;
+    }
+    .metric-card h3 { font-size: 1.1rem; margin-bottom: 0.5rem; }
+    .metric-value { font-size: 2rem; color: #007bff; }
+
+    /* Features Grid */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+      gap: 1.5rem;
+    }
+    .feature-card {
+      background: #fff;
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+      text-align: center;
+      opacity: 0; transform: translateY(20px);
+      animation: slideUp 0.6s forwards;
+    }
+    .feature-card .icon {
+      font-size: 2rem;
+      margin-bottom: 0.75rem;
+    }
+    .feature-card h3 {
+      margin-bottom: 0.5rem;
+      color: #00457c;
+    }
+
+    /* Steps */
+    .how-it-works ol.steps {
+      counter-reset: step;
+      margin-left: 1rem;
+    }
+    .how-it-works li {
+      position: relative;
+      margin-bottom: 1rem;
+      padding-left: 2.5rem;
+    }
+    .how-it-works li::before {
+      counter-increment: step;
+      content: counter(step);
+      position: absolute;
+      left: 0; top: 0;
+      width: 2rem; height: 2rem;
+      text-align: center;
+      line-height: 2rem;
+      background: #007bff;
+      color: #fff;
+      border-radius: 50%;
+    }
+
+    /* Chat Teaser */
+    .chat-teaser {
+      background: #fff;
+      padding: 2rem;
+      margin: 3rem 0;
+      text-align: center;
+      border-radius: 8px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+      opacity: 0; transform: translateY(20px);
+      animation: slideUp 0.6s forwards 0.3s;
+    }
+    .chat-teaser h2 {
+      margin-bottom: 0.5rem;
+      color: #00457c;
+    }
+
+    /* Footer */
+    .site-footer {
+      text-align: center;
+      padding: 1rem;
+      color: #666;
+      font-size: 0.9rem;
+      margin-top: 4rem;
+      opacity: 0; animation: fadeIn 0.6s forwards 0.5s;
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+  </style>
+</body>
+</html>
