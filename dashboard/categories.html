@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SNHU Dashboard – Category Trends</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module" src="js/common.js"></script>
+  <script type="module" src="js/categories.js" defer></script>
+  <script type="module" src="data.js"></script>
+</head>
+<body>
+  <aside>
+    <nav>
+      <a href="index.html">Overview</a>
+      <a href="categories.html">Trends</a>
+      <a href="insights.html">Insights</a>
+      <a href="recommendations.html">Recommendations</a>
+    </nav>
+  </aside>
+
+  <div class="content">
+    <h1>Category Trends</h1>
+    <div class="dropdown">
+      <label for="year-select">Show:</label>
+      <select id="year-select">
+        <option value="both">Both 2022 & 2023</option>
+        <option value="2022">2022 Only</option>
+        <option value="predicted">2023 Only</option>
+      </select>
+    </div>
+    <canvas id="categoryChart"></canvas>
+  </div>
+</body>
+</html>
